@@ -1,0 +1,9 @@
+h1 {
+    margin-left: 40px;
+  }
+  
+  .row.combo-box {
+    display: flex;
+    align-items: center;
+  }
+  
