@@ -1,21 +1,20 @@
 // Home.js
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHand } from "@fortawesome/free-solid-svg-icons"
 import connectRabbitMq from '../services/rabbitmq.js';
 import NavBar from '../components/NavBar/Navbar.js';
 import SideBar from "../components/SideBarNavigator/SideBar.js";
+import SelectedBox from "../components/Combos/SelectedBox.js";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import './home.css';
 
 export default function Home() {
-    // Exemplo de dados para o Combobox (altere conforme necessário)
-    const dataOptions = [
-      { title: 'Dado 1' },
-      { title: 'Dado 2' },
-      { title: 'Dado 3' },
-    ];
 
+
+   
     const handleComboboxChange = (selectedValue) => {
       console.log('Valor selecionado:', selectedValue);
     };
@@ -29,17 +28,16 @@ export default function Home() {
             <NavBar />
             <SideBar />
             <div className="container-fluid">
-                <h1>Selecione o dado que irá visualizar</h1>
+                <p className="title">Selecione o dado que irá visualizar <FontAwesomeIcon icon={faHand}/></p>
                 <div className="row justify-content-center combo-box">
                     <div className="col-md-3">
-                        
-                    
+                        <SelectedBox placeholder={"Selecione os parametros"}/>
                     </div>
                     <div className="col-md-3">
-                        coluna 2
+                        <SelectedBox placeholder={"Selecione o componente"}/>
                     </div>
                     <div className="col-md-3">
-                        coluna 3
+                        <SelectedBox name={"Selecione o periodo"}/>
                     </div>
                 </div>
             </div>
