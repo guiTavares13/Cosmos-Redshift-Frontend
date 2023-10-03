@@ -1,12 +1,24 @@
-import React from "react";
+import React from 'react';
+import Select from 'react-select';
 
-export default function SelectedBox({placeholder}) {
+export default function SelectedBox({ placeholder, items }) {
 
-    return(
-        <select name={placeholder}>
-            <option value={"Item 1"}>Item 1</option>
-            <option value={"Item 2"}>Item 2</option>
-            <option value={"Item 3"}>Item 3</option>
-        </select>
-    )
+  const options = items
+    ? items.map((item, index) => ({
+        label: item,
+        value: index,
+      }))
+    : [];
+
+  return (
+    <Select
+      isMulti
+      closeMenuOnSelect={false}
+      name="selected-box"
+      options={options}
+      className="basic-multi-select"
+      classNamePrefix="select"
+      placeholder={placeholder}
+    />
+  );
 }
