@@ -21,12 +21,13 @@
 /* Estilo do sidebar */
 #sidebar {
     position: fixed;
-    top: 30;
+    top: 110px;
     left: -400px;
     width: 400px;
     height: 100%;
     background-color: #333;
     transition: left 0.3s;
+    z-index: 200;
 }
 
 #sidebar.visible {

@@ -1,10 +1,10 @@
 import { Client } from "@stomp/stompjs";
 
-function connectRabbitMq(id) {
+function connectRabbitMq(idQueue) {
 
-    console.log(id)
+    console.log("aqui é o ID" + idQueue)
     const client = new Client({
-        brokerURL: "ws://192.168.15.2:15674/ws",
+        brokerURL: "ws://192.168.15.10:15674/ws",
         connectHeaders: {
             login: "guest",
             passcode: "guest",
@@ -17,7 +17,7 @@ function connectRabbitMq(id) {
 
     client.onConnect = function (frame) {
         console.log("Connected");
-        const subscription = client.subscribe("/queue/" + id, function (message) {
+        const subscription = client.subscribe("/queue/" + idQueue, function (message) {
             const receivedData = JSON.parse(message.body);
             console.log("Received message: ", receivedData);
         })

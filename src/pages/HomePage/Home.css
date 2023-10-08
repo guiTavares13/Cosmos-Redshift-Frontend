@@ -7,9 +7,18 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
 }
 
 .title {
   padding-left: 30px;
   padding-top: 30px;
 }
+
+.attribute-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
