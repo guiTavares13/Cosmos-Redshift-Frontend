@@ -10,6 +10,9 @@ import AttributeSelectedBox from "../../components/Combos/AttributeSelectedBox.j
 import ComponentSelectedBox from "../../components/Combos/ComponentSelectedBox.js";
 
 
+import imagem_ from '../../assets/correlacao.png'
+
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import './Home.css';
 
@@ -126,9 +129,9 @@ export default function Home() {
 
     useEffect(() => {
         if (idQueue) {
-          connectRabbitMq(idQueue);
+            connectRabbitMq(idQueue);
         }
-      }, [idQueue]);
+    }, [idQueue]);
 
     return (
         <>
@@ -152,6 +155,9 @@ export default function Home() {
                     </div>
                 </div>
                 {/* ... */}
+                <div style={{ display: 'flex', justifyContent: 'center', paddingTop:30 }}>
+                    <img src={imagem_} alt="Exemplo de correlação" />
+                </div>
             </div>
             <div>
                 <button onClick={requestAnalysis}>Analise</button>

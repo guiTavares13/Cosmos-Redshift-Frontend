@@ -1,3 +1,5 @@
+
+
 import { Client } from "@stomp/stompjs";
 
 // Função sleep para aguardar um período antes de conectar
@@ -24,7 +26,7 @@ async function connectRabbitMq(idQueue) {
 
   client.onConnect = function (frame) {
     console.log("Connected");
-    const subscription = client.subscribe(`${idQueue}`, function (message) {
+    const subscription = client.subscribe(`/queue/${idQueue}`, function (message) {
       const receivedData = JSON.parse(message.body);
       console.log("Received message: ", receivedData);
     });
