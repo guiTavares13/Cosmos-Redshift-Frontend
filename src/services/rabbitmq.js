@@ -51,8 +51,9 @@ const queue = '/queue/493d1d59-6bf3-4fbc-985f-ad3fe3877443';
 
 async function connectRabbitMq(idQueue) {
 
+
   const client = new StompJs.Client({
-    webSocketFactory: () => new SockJS('http://192.168.15.7/ws'),
+    webSocketFactory: () => new SockJS('http://172.20.10.7:15674/ws'),
     connectHeaders: {
       login: 'guest',
       passcode: 'guest'

@@ -156,7 +156,7 @@ export default function Home() {
                 </div>
                 {/* ... */}
                 <div style={{ display: 'flex', justifyContent: 'center', paddingTop:30 }}>
-                    <img src={imagem_} alt="Exemplo de correlação" />
+                    {/* <img src={imagem_} alt="Exemplo de correlação" /> */}
                 </div>
             </div>
             <div>
