@@ -106,7 +106,7 @@ export default function Home() {
         };
 
         try {
-            const response = await api.post('/api/requestAnalysis', payloadJson, config)
+            const response = await api.post('/api/sync/requestAnalysis', payloadJson, config)
                 .then((response) => response.data)
                 .catch((err) => {
                     console.error(err);
@@ -117,7 +117,7 @@ export default function Home() {
             console.error(err);
         }
 
-        connectRabbitMq(idQueue);
+        //connectRabbitMq(idQueue);
     }
 
 
