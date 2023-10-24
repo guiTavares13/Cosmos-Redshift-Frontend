@@ -8,6 +8,7 @@ h1 {
   align-items: center;
   justify-content: center;
   overflow: visible;
+  padding-top: 30px;
 }
 
 .title {
