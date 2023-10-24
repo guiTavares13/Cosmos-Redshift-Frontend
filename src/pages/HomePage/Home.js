@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext, createContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHand } from "@fortawesome/free-solid-svg-icons";
@@ -121,10 +121,13 @@ export default function Home() {
 
             if (response != null) {
                 let key;
+                console.log("action "+ payload.action)
                 switch (payload.action) {
                     case EnumComponent.CORRELATION_ANALYSIS:
                         key = "correlationAnalysis";
-                        setImgCorrelation(key);
+                        console.log("aqui1")
+                        console.log("salve"+ response.img)
+                        setImgCorrelation(response.img);
                         break;
                     case EnumComponent.LINEAR_REGRESSION_ANALYSIS:
                         key = "linearRegressionAnalysis";
@@ -148,9 +151,6 @@ export default function Home() {
         }
     }
 
-
-
-
     const storeData = async (key, value) => {
         try {
             await AsyncStorage.setItem(key, value);
@@ -159,10 +159,21 @@ export default function Home() {
         }
     }
 
+    // const imagesLoaded = () => {
+    //     const imagesContext = createContext();
+
+        
+    // }
+
     useEffect(() => {
         getEntities();
         setSelectedComponents(components)
     }, []);
+
+    // useEffect(() => {
+    //     imagesLoaded()
+        
+    // }, [imgCorrelation || imgGraph2D || imgLinearRegression]);
 
     return (
         <>
@@ -188,16 +199,19 @@ export default function Home() {
                 {/* ... */}
                 <div className="row justify-content-center d-flex justify-content-betwen">
                     <div className="col-md-6">
-                        <ImageCorrelationComponent />
+                        <ImageCorrelationComponent imgBase64Object={imgCorrelation}/>
                     </div>
                     <div className="col-md-6">
-                        <ImageCorrelationComponent />
+                        <ImageCorrelationComponent imgBase64Object={imgLinearRegression} />
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                        <ImageGraph2DComponent/>
+                        <ImageGraph2DComponent imgBase64Object={imgGraph2D}/>
                     </div>
+                </div>
+                <div>
+                    <button onClick={requestAnalysis}>Teste</button>
                 </div>
             </div>
 
