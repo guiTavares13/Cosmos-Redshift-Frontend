@@ -29,14 +29,20 @@ export default function Home() {
     const [selectedAtributes, setSelectedAtributes] = useState(null);
     const [selectedComponents, setSelectedComponents] = useState(null);
     const [selectedEntity, setSelectedEntity] = useState(null);
+    const [selectedComponent, setSelectedComponent] = useState(null);
     const [queue, setQueue] = useState(null);
     const [imgCorrelation, setImgCorrelation] = useState(null);
     const [imgGraph2D, setImgGraph2D] = useState(null);
     const [imgLinearRegression, setImgLinearRegression] = useState(null);
 
-    const handleComboboxChange = (selectedValue) => {
-        console.log('Valor selecionado:', selectedValue);
+    const handleComboboxChange = (selectedValues) => {
+        console.log('Valores selecionados:', selectedValues);
+    
+        const backendValues = selectedValues.map(value => actionMapping[value]);
+        setSelectedComponents(backendValues);
     };
+    
+
 
     const handleSidebarItemClick = (item) => {
         setSelectedParameters(item);
@@ -44,6 +50,13 @@ export default function Home() {
         const selectedEntity = data.find((entity) => entity.id === item.id);
         setSelectedEntity(selectedEntity);
     };
+
+    const actionMapping = {
+        "Regressão Linear": "LINEAR_REGRESSION_ANALYSIS",
+        "Correlação": "CORRELATION_ANALYSIS",
+        "Visualização 2D": "2D_GRAPHICS",
+    };
+
 
 
     const components = [
@@ -84,72 +97,74 @@ export default function Home() {
             console.error(err)
         }
     }
-
     async function requestAnalysis() {
-        console.log(selectedAtributes)
-        console.log(selectedParameters)
-        console.log(selectedComponents)
+        console.log(selectedAtributes);
+        console.log(selectedParameters);
+        console.log(selectedComponents);
 
         if (!selectedComponents || !selectedParameters || !selectedAtributes || !selectedEntity) {
             console.error("Valores necessários não foram selecionados.");
             return;
         }
 
-        const payload = {
-            "action": "CORRELATION_ANALYSIS",
-            "entity": selectedEntity.id,
-            "entity_type": selectedEntity.type,
-            "fields": selectedAtributes,
-        };
-        console.log(payload);
+        // Iterando pelos componentes selecionados e fazendo as chamadas ao backend
+        for (const selectedComponent of selectedComponents) {
+            const payload = {
+                action: selectedComponent,
+                entity: selectedEntity.id,
+                entity_type: selectedEntity.type,
+                fields: selectedAtributes,
+            };
+            console.log(payload);
 
-        const payloadJson = JSON.stringify(payload);
+            const payloadJson = JSON.stringify(payload);
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        };
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
 
-        try {
-            const response = await api.post('/api/sync/requestAnalysis', payloadJson, config)
-                .then((response) => response.data)
-                .catch((err) => {
-                    console.error(err);
-                });
-            console.log(response);
+            try {
+                const response = await api.post('/api/sync/requestAnalysis', payloadJson, config)
+                    .then((response) => response.data)
+                    .catch((err) => {
+                        console.error(err);
+                    });
+                console.log(response);
 
-            if (response != null) {
-                let key;
-                console.log("action "+ payload.action)
-                switch (payload.action) {
-                    case EnumComponent.CORRELATION_ANALYSIS:
-                        key = "correlationAnalysis";
-                        console.log("aqui1")
-                        console.log("salve"+ response.img)
-                        setImgCorrelation(response.img);
-                        break;
-                    case EnumComponent.LINEAR_REGRESSION_ANALYSIS:
-                        key = "linearRegressionAnalysis";
-                        setImgLinearRegression(key);
-                        break;
-                    case EnumComponent.TWOD_GRAPHICS:
-                        key = "twoDGraphics";
-                        setImgGraph2D(key);
-                        break;
-                    default:
-                        console.error("Ação desconhecida!");
-                        return;
+                if (response != null) {
+                    let key;
+                    console.log("action " + payload.action);
+                    switch (payload.action) {
+                        case EnumComponent.CORRELATION_ANALYSIS:
+                            key = "correlationAnalysis";
+                            console.log("aqui1");
+                            console.log("salve" + response.img);
+                            setImgCorrelation(response.img);
+                            break;
+                        case EnumComponent.LINEAR_REGRESSION_ANALYSIS:
+                            key = "linearRegressionAnalysis";
+                            setImgLinearRegression(response.img);
+                            break;
+                        case EnumComponent.TWOD_GRAPHICS:
+                            key = "twoDGraphics";
+                            setImgGraph2D(response.img);
+                            break;
+                        default:
+                            console.error("Ação desconhecida!");
+                            return;
+                    }
+
+                    const value = JSON.stringify(response);
+                    await storeData(key, value.img);
                 }
-
-                const value = JSON.stringify(response);
-                await storeData(key, value.img);
+            } catch (err) {
+                console.error(err);
             }
-
-        } catch (err) {
-            console.error(err);
         }
     }
+
 
     const storeData = async (key, value) => {
         try {
@@ -162,7 +177,7 @@ export default function Home() {
     // const imagesLoaded = () => {
     //     const imagesContext = createContext();
 
-        
+
     // }
 
     useEffect(() => {
@@ -172,7 +187,7 @@ export default function Home() {
 
     // useEffect(() => {
     //     imagesLoaded()
-        
+
     // }, [imgCorrelation || imgGraph2D || imgLinearRegression]);
 
     return (
@@ -193,13 +208,14 @@ export default function Home() {
                         <ComponentSelectedBox
                             placeholder={"Selecione o componente"}
                             items={selectedComponents}
+                            onChange={handleComboboxChange}
                         />
                     </div>
                 </div>
                 {/* ... */}
                 <div className="row justify-content-center d-flex justify-content-betwen">
                     <div className="col-md-6">
-                        <ImageCorrelationComponent imgBase64Object={imgCorrelation}/>
+                        <ImageCorrelationComponent imgBase64Object={imgCorrelation} />
                     </div>
                     <div className="col-md-6">
                         <ImageCorrelationComponent imgBase64Object={imgLinearRegression} />
@@ -207,7 +223,7 @@ export default function Home() {
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                        <ImageGraph2DComponent imgBase64Object={imgGraph2D}/>
+                        <ImageGraph2DComponent imgBase64Object={imgGraph2D} />
                     </div>
                 </div>
                 <div>

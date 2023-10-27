@@ -7,19 +7,16 @@ export default function ImageGraph2DComponent({ imgBase64Object }) {
   console.log(imgBase64Object)
   const [imgSrc, setImgSrc] = useState(null);
 
+
   useEffect(() => {
-    const base64ToPng = (jsonData) => {
-      if (jsonData && 'data' in jsonData && jsonData.data.startsWith('data:image/png;base64,')) {
-        setImgSrc(jsonData.data);
-      } else {
-        console.error('JSON input is not properly formatted');
-      }
-    };
 
     if (imgBase64Object) {
-      base64ToPng(imgBase64Object);
+        setImgSrc('data:image/png;base64,' + imgBase64Object);
+    } else {
+        console.error('JSON input is not properly formatted');
     }
-  }, [imgBase64Object]);
+
+}, [imgBase64Object]);
 
   return (
     <div className="img-graph2d">
