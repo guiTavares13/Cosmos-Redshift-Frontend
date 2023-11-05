@@ -158,8 +158,10 @@ export default function Home() {
     
 
     const handleMessageReceived = async (receivedData) => {
+        console.log("HandleMessageReceived:", receivedData);
+        
         let key;
-        switch (receivedData.componentType) {
+        switch (selectedComponent) {
             case EnumComponent.CORRELATION_ANALYSIS:
                 key = "correlationAnalysis";
                 setImgCorrelation(receivedData.img);
