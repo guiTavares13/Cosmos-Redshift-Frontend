@@ -1,7 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 
-export default function ComponentSelectedBox({ placeholder, items, onChange }) {
+export default function ComponentSelectedBox({ placeholder, items, onChange, onMenuClose }) {
   const options = items ? items.map((item) => ({ label: item, value: item })) : [];
 
   const handleChange = (selectedOptions) => {
@@ -36,6 +36,7 @@ export default function ComponentSelectedBox({ placeholder, items, onChange }) {
       placeholder={placeholder}
       onChange={handleChange}
       styles={fixedHeightStyles}
+      onMenuClose={onMenuClose}
     />
   );
 }

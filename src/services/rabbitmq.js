@@ -4,7 +4,7 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function connectRabbitMq(idQueue) {
+async function connectRabbitMq(idQueue, callback) {
   console.log(idQueue);
   const client = new Client({
     brokerURL: "ws://localhost:15674/ws",
@@ -25,7 +25,16 @@ async function connectRabbitMq(idQueue) {
     const subscription = client.subscribe(`/queue/${idQueue}`, function (message) {
       const receivedData = JSON.parse(message.body);
       console.log("Received message: ", receivedData);
-    });
+
+      if(callback) {
+        callback(receivedData);
+      }
+
+      client.forceDisconnect();
+
+    },
+    { durable: 'false', exclusive: 'false', 'auto-delete':'true' }
+    );
   };
 
   client.onWebSocketError = function (event) {

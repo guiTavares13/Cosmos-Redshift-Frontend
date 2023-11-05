@@ -17,6 +17,7 @@ import ImageGraph2DComponent from "../../components/ImageGraph2D/ImageGraph2DCom
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import './Home.css';
+import connectRabbitMq from "../../services/rabbitmq.js";
 
 export default function Home() {
 
@@ -122,45 +123,19 @@ export default function Home() {
             };
 
             try {
-                const response = await api.post('/api/sync/requestAnalysis', payloadJson, config)
+                const response = await api.post('/api/requestAnalysis', payloadJson, config)
                     .then((response) => response.data)
                     .catch((err) => {
                         console.error(err);
                     });
                 console.log(response);
+                setQueue(response);
 
-                if (response != null) {
-                    let key;
-                    console.log("action " + payload.action);
-                    switch (payload.action) {
-                        case EnumComponent.CORRELATION_ANALYSIS:
-                            key = "correlationAnalysis";
-                            console.log("aqui1");
-                            console.log("salve" + response.img);
-                            setImgCorrelation(response.img);
-                            break;
-                        case EnumComponent.LINEAR_REGRESSION_ANALYSIS:
-                            key = "linearRegressionAnalysis";
-                            setImgLinearRegression(response.img);
-                            break;
-                        case EnumComponent.TWOD_GRAPHICS:
-                            key = "twoDGraphics";
-                            setImgGraph2D(response.img);
-                            break;
-                        default:
-                            console.error("Ação desconhecida!");
-                            return;
-                    }
-
-                    const value = JSON.stringify(response);
-                    await storeData(key, value.img);
-                }
             } catch (err) {
                 console.error(err);
             }
         }
     }
-
 
     const storeData = async (key, value) => {
         try {
@@ -174,6 +149,37 @@ export default function Home() {
         getEntities();
         setAvailableComponents(components);
     }, []);
+
+    useEffect(() => {
+        if (queue) {
+            connectRabbitMq(queue, handleMessageReceived);
+        }
+    }, [queue]);
+    
+
+    const handleMessageReceived = async (receivedData) => {
+        let key;
+        switch (receivedData.componentType) {
+            case EnumComponent.CORRELATION_ANALYSIS:
+                key = "correlationAnalysis";
+                setImgCorrelation(receivedData.img);
+                break;
+            case EnumComponent.LINEAR_REGRESSION_ANALYSIS:
+                key = "linearRegressionAnalysis";
+                setImgLinearRegression(receivedData.img);
+                break;
+            case EnumComponent.TWOD_GRAPHICS:
+                key = "twoDGraphics";
+                setImgGraph2D(receivedData.img);
+                break;
+            default:
+                console.error("Ação desconhecida!");
+                return;
+        }
+    
+        const value = JSON.stringify(receivedData);
+        await storeData(key, value.img);
+    }
 
     return (
         <>
@@ -193,6 +199,7 @@ export default function Home() {
                             placeholder={"Selecione o componente"}
                             items={availableComponents}
                             onChange={handleComboboxChange}
+                            onMenuClose={requestAnalysis}
                         />
                     </div>
 
