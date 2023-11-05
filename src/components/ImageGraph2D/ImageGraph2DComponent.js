@@ -21,7 +21,7 @@ export default function ImageGraph2DComponent({ imgBase64Object }) {
   return (
     <div className="img-graph2d">
       {imgSrc ? (
-        <img src={imgSrc} alt="Converted PNG" />
+        <img src={imgSrc} alt="Converted PNG" className="image" />
       ) : (
         <div className="text-center custom-loader">
           <LoaderComponent />

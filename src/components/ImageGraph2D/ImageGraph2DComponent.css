@@ -1,11 +1,11 @@
 .img-graph2d {
-    width: 100%;
+    width: 90%;
     max-width: 1900px;
     height: 300px;
     position: relative;
     display: flex;
     align-items: center;
-    background-color: beige;
+    background-color: '#fff';
     border: 0.5px solid beige;
     border-radius: 4px;
     margin-top: 100px;

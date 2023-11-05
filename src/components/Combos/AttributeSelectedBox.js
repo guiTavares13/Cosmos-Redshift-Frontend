@@ -20,10 +20,23 @@ export default function AttributeSelectedBox({ placeholder, items, onChange }) {
 
   const handleChange = (selectedOptions) => {
     if (onChange) {
-      // Use .map() para extrair apenas os valores de cada opção selecionada
       const selectedValues = selectedOptions.map((option) => option.value);
       onChange(selectedValues);
     }
+  };
+
+  const fixedHeightStyles = {
+    control: (provided) => ({
+      ...provided,
+      minHeight: 38,
+      maxHeight: 38, 
+      height: 38, 
+    }),
+    valueContainer: (provided) => ({
+      ...provided,
+      maxHeight: '100%',
+      overflow: 'auto',
+    }),
   };
 
   return (
@@ -32,10 +45,11 @@ export default function AttributeSelectedBox({ placeholder, items, onChange }) {
       closeMenuOnSelect={false}
       name="selected-box"
       options={options}
-      className="basic-multi-select"
+      className="basic-multi-select fixed-width-select"
       classNamePrefix="select"
       placeholder={placeholder}
       onChange={handleChange}
+      styles={fixedHeightStyles}
     />
   );
 }

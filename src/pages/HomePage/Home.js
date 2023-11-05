@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useContext, createContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHand } from "@fortawesome/free-solid-svg-icons";
-import { Audio } from 'react-loader-spinner'
-
-// Outras importações...
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faHand } from "@fortawesome/free-solid-svg-icons";
+// import { Audio } from 'react-loader-spinner'
 
 import api from "../../services/api.js";
 import EnumComponent from "../../Common/EnumComponent.js"
@@ -34,14 +32,16 @@ export default function Home() {
     const [imgCorrelation, setImgCorrelation] = useState(null);
     const [imgGraph2D, setImgGraph2D] = useState(null);
     const [imgLinearRegression, setImgLinearRegression] = useState(null);
+    const [availableComponents, setAvailableComponents] = useState([]);
+
 
     const handleComboboxChange = (selectedValues) => {
         console.log('Valores selecionados:', selectedValues);
-    
+
         const backendValues = selectedValues.map(value => actionMapping[value]);
         setSelectedComponents(backendValues);
     };
-    
+
 
 
     const handleSidebarItemClick = (item) => {
@@ -98,16 +98,12 @@ export default function Home() {
         }
     }
     async function requestAnalysis() {
-        console.log(selectedAtributes);
-        console.log(selectedParameters);
-        console.log(selectedComponents);
 
         if (!selectedComponents || !selectedParameters || !selectedAtributes || !selectedEntity) {
             console.error("Valores necessários não foram selecionados.");
             return;
         }
 
-        // Iterando pelos componentes selecionados e fazendo as chamadas ao backend
         for (const selectedComponent of selectedComponents) {
             const payload = {
                 action: selectedComponent,
@@ -174,28 +170,16 @@ export default function Home() {
         }
     }
 
-    // const imagesLoaded = () => {
-    //     const imagesContext = createContext();
-
-
-    // }
-
     useEffect(() => {
         getEntities();
-        setSelectedComponents(components)
+        setAvailableComponents(components);
     }, []);
-
-    // useEffect(() => {
-    //     imagesLoaded()
-
-    // }, [imgCorrelation || imgGraph2D || imgLinearRegression]);
 
     return (
         <>
             <Navbar />
-            <SideBar data={data} onItemClick={handleSidebarItemClick} onChange={handleObjetChange} />
+            <SideBar data={data} onItemClick={handleSidebarItemClick} onChange={handleObjetChange} selectedEntity={selectedEntity} />
             <div className="container-fluid">
-                {/* ... */}
                 <div className="row justify-content-center combo-box">
                     <div className="col-md-3">
                         <AttributeSelectedBox
@@ -207,18 +191,20 @@ export default function Home() {
                     <div className="col-md-3">
                         <ComponentSelectedBox
                             placeholder={"Selecione o componente"}
-                            items={selectedComponents}
+                            items={availableComponents}
                             onChange={handleComboboxChange}
                         />
                     </div>
+
                 </div>
-                {/* ... */}
                 <div className="row justify-content-center d-flex justify-content-betwen">
-                    <div className="col-md-6">
-                        <ImageCorrelationComponent imgBase64Object={imgCorrelation} />
-                    </div>
-                    <div className="col-md-6">
-                        <ImageCorrelationComponent imgBase64Object={imgLinearRegression} />
+                    <div className="row adjust-margin">
+                        <div className="col-md-6 text-center column-wrapper">
+                            <ImageCorrelationComponent imgBase64Object={imgCorrelation} />
+                        </div>
+                        <div className="col-md-6 text-center column-wrapper">
+                            <ImageCorrelationComponent imgBase64Object={imgLinearRegression} />
+                        </div>
                     </div>
                 </div>
                 <div className="row">
