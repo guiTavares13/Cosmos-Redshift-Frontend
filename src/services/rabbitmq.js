@@ -7,7 +7,7 @@ function sleep(ms) {
 async function connectRabbitMq(idQueue) {
   console.log(idQueue);
   const client = new Client({
-    brokerURL: "ws://192.168.15.10:15674/ws",
+    brokerURL: "ws://localhost:15674/ws",
     connectHeaders: {
       login: "guest",
       passcode: "guest",
