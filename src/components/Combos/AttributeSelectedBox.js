@@ -15,7 +15,7 @@ function extractAttributes(item) {
   return attributes;
 }
 
-export default function AttributeSelectedBox({ placeholder, items, onChange }) {
+export default function AttributeSelectedBox({ placeholder, items, onChange, onMenuClose }) {
   const options = extractAttributes(items);
 
   const handleChange = (selectedOptions) => {
@@ -50,6 +50,7 @@ export default function AttributeSelectedBox({ placeholder, items, onChange }) {
       placeholder={placeholder}
       onChange={handleChange}
       styles={fixedHeightStyles}
+      onMenuClose={onMenuClose}
     />
   );
 }

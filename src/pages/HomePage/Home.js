@@ -11,6 +11,7 @@ import Navbar from '../../components/NavBar/Navbar.js'
 import SideBar from "../../components/SideBarNavigator/SideBar.js";
 import AttributeSelectedBox from "../../components/Combos/AttributeSelectedBox.js";
 import ComponentSelectedBox from "../../components/Combos/ComponentSelectedBox.js";
+import NotificationComponent from "../../components/Notifications/NotificationComponent.js";
 
 import ImageCorrelationComponent from "../../components/ImageCorrelation/ImageCorrelationComponent.js";
 import ImageGraph2DComponent from "../../components/ImageGraph2D/ImageGraph2DComponent.js";
@@ -23,6 +24,9 @@ export default function Home() {
 
     const [isLoading, setIsLoading] = useState(true);
 
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState('');
+
     const [data, setData] = useState([]);
     const [selectedParameters, setSelectedParameters] = useState(null);
     const [selectedAtributes, setSelectedAtributes] = useState(null);
@@ -33,19 +37,30 @@ export default function Home() {
     const [imgCorrelation, setImgCorrelation] = useState(null);
     const [imgGraph2D, setImgGraph2D] = useState(null);
     const [imgLinearRegression, setImgLinearRegression] = useState(null);
+    const [queues, setQueues] = useState({});
+    const [imgData, setImgData] = useState({});
+
     const [availableComponents, setAvailableComponents] = useState([]);
 
 
     const handleComboboxChange = (selectedValues) => {
+        clearImagesAndQueue();
         console.log('Valores selecionados:', selectedValues);
 
         const backendValues = selectedValues.map(value => actionMapping[value]);
         setSelectedComponents(backendValues);
     };
 
+    const clearImagesAndQueue = () => {
+        setImgCorrelation(null);
+        setImgGraph2D(null);
+        setImgLinearRegression(null);
+        setQueues({});
+    };
 
 
     const handleSidebarItemClick = (item) => {
+        clearImagesAndQueue();
         setSelectedParameters(item);
 
         const selectedEntity = data.find((entity) => entity.id === item.id);
@@ -57,8 +72,6 @@ export default function Home() {
         "Correlação": "CORRELATION_ANALYSIS",
         "Visualização 2D": "2D_GRAPHICS",
     };
-
-
 
     const components = [
         "Regressão Linear",
@@ -129,7 +142,10 @@ export default function Home() {
                         console.error(err);
                     });
                 console.log(response);
-                setQueue(response);
+                setNotificationMessage('Requisição enviada');
+                setShowNotification(true);
+                setTimeout(() => setShowNotification(false), 3000);
+                setQueues((prevQueues) => ({ ...prevQueues, [selectedComponent]: response }));
 
             } catch (err) {
                 console.error(err);
@@ -151,37 +167,58 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        if (queue) {
-            connectRabbitMq(queue, handleMessageReceived);
+        for (const component in queues) {
+            connectRabbitMq(queues[component], (receivedData) =>
+                handleComponentMessage(component, receivedData)
+            );
         }
-    }, [queue]);
-    
+    }, [queues]);
 
-    const handleMessageReceived = async (receivedData) => {
+
+    function handleMessageCorrelation(receivedData) {
+        setImgData((prevImgData) => ({ ...prevImgData, correlationAnalysis: receivedData.img }));
+    }
+
+    function handleMessageLinearRegression(receivedData) {
+        setImgData((prevImgData) => ({ ...prevImgData, linearRegressionAnalysis: receivedData.img }));
+    }
+
+    function handleMessageTwoDGraphics(receivedData) {
+        setImgData((prevImgData) => ({ ...prevImgData, twoDGraphics: receivedData.img }));
+    }
+
+    const queueHandlers = {
+        [EnumComponent.CORRELATION_ANALYSIS]: handleMessageCorrelation,
+        [EnumComponent.LINEAR_REGRESSION_ANALYSIS]: handleMessageLinearRegression,
+        [EnumComponent.TWOD_GRAPHICS]: handleMessageTwoDGraphics,
+    };
+
+
+    function handleComponentMessage(selectedComponent, receivedData) {
         console.log("HandleMessageReceived:", receivedData);
-        
+        setNotificationMessage('Mensagem recebida');
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 3000);
+
         let key;
         switch (selectedComponent) {
             case EnumComponent.CORRELATION_ANALYSIS:
                 key = "correlationAnalysis";
-                setImgCorrelation(receivedData.img);
                 break;
             case EnumComponent.LINEAR_REGRESSION_ANALYSIS:
                 key = "linearRegressionAnalysis";
-                setImgLinearRegression(receivedData.img);
                 break;
             case EnumComponent.TWOD_GRAPHICS:
                 key = "twoDGraphics";
-                setImgGraph2D(receivedData.img);
                 break;
             default:
                 console.error("Ação desconhecida!");
                 return;
         }
-    
-        const value = JSON.stringify(receivedData);
-        await storeData(key, value.img);
+
+        setImgData((prevImgData) => ({ ...prevImgData, [key]: receivedData.img }));
     }
+
 
     return (
         <>
@@ -194,6 +231,7 @@ export default function Home() {
                             placeholder={"Selecione os parametros"}
                             items={selectedEntity}
                             onChange={handleAttributeChange}
+                            onMenuClose={requestAnalysis}
                         />
                     </div>
                     <div className="col-md-3">
@@ -209,23 +247,20 @@ export default function Home() {
                 <div className="row justify-content-center d-flex justify-content-betwen">
                     <div className="row adjust-margin">
                         <div className="col-md-6 text-center column-wrapper">
-                            <ImageCorrelationComponent imgBase64Object={imgCorrelation} />
+                            <ImageCorrelationComponent imgBase64Object={imgData.correlationAnalysis} />
                         </div>
                         <div className="col-md-6 text-center column-wrapper">
-                            <ImageCorrelationComponent imgBase64Object={imgLinearRegression} />
+                            <ImageCorrelationComponent imgBase64Object={imgData.linearRegressionAnalysis} />
                         </div>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                        <ImageGraph2DComponent imgBase64Object={imgGraph2D} />
+                        <ImageGraph2DComponent imgBase64Object={imgData.twoDGraphics} />
                     </div>
                 </div>
-                <div>
-                    <button onClick={requestAnalysis}>Teste</button>
-                </div>
             </div>
-
+            <NotificationComponent message={notificationMessage} show={showNotification} />
         </>
     );
 }

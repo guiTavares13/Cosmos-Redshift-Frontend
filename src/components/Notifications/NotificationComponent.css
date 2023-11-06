@@ -1,0 +1,24 @@
+.notification-component {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    font-size: 14px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+  }
+  
+  .notification-component.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  .notification-component.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+  
