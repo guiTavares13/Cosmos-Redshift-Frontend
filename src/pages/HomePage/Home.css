@@ -23,3 +23,18 @@ h1 {
   margin: 1rem 0;
 }
 
+.column-wrapper {
+  margin-top: 1rem;
+  padding: 0 0.5rem;
+  height: 60vh; 
+}
+
+.notification-container {
+  display: flex;
+  flex-direction: column-reverse;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 320px;
+}

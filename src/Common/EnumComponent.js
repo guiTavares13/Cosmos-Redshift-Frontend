@@ -1,7 +1,6 @@
 const component = Object.freeze({
     CORRELATION_ANALYSIS: "CORRELATION_ANALYSIS",
     LINEAR_REGRESSION_ANALYSIS: "LINEAR_REGRESSION_ANALYSIS",
-    TWOD_GRAPHICS: "TWOD_GRAPHICS",
 });
 
 export default component;

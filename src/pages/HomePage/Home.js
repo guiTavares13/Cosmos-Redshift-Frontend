@@ -22,11 +22,14 @@ import connectRabbitMq from "../../services/rabbitmq.js";
 
 export default function Home() {
 
-    const [isLoading, setIsLoading] = useState(true);
 
-    const [showNotification, setShowNotification] = useState(false);
-    const [notificationMessage, setNotificationMessage] = useState('');
-
+    const [notification, setNotification] = useState({
+        message: '',
+        entity_type: '',
+        action: '',
+        show: false,
+    });
+    const [notifications, setNotifications] = useState([]);
     const [data, setData] = useState([]);
     const [selectedParameters, setSelectedParameters] = useState(null);
     const [selectedAtributes, setSelectedAtributes] = useState(null);
@@ -58,6 +61,16 @@ export default function Home() {
         setQueues({});
     };
 
+    const displayNotification = (messageObj) => {
+        const newNotification = { ...messageObj, show: true };
+        setNotifications(prevNotifications => [...prevNotifications, newNotification]);
+
+        setTimeout(() => {
+            setNotifications(prevNotifications => prevNotifications.filter(n => n !== newNotification));
+        }, 5000);
+    };
+
+
 
     const handleSidebarItemClick = (item) => {
         clearImagesAndQueue();
@@ -70,13 +83,11 @@ export default function Home() {
     const actionMapping = {
         "Regressão Linear": "LINEAR_REGRESSION_ANALYSIS",
         "Correlação": "CORRELATION_ANALYSIS",
-        "Visualização 2D": "2D_GRAPHICS",
     };
 
     const components = [
         "Regressão Linear",
         "Correlação",
-        "Visualização 2D"
     ]
 
     const handleAttributeChange = (selectedAttributes) => {
@@ -142,9 +153,11 @@ export default function Home() {
                         console.error(err);
                     });
                 console.log(response);
-                setNotificationMessage('Requisição enviada');
-                setShowNotification(true);
-                setTimeout(() => setShowNotification(false), 3000);
+                displayNotification({
+                    message: "Pedido de análise enviado com sucesso!",
+                    entity_type: payload.entity_type,
+                    action: payload.action,
+                });
                 setQueues((prevQueues) => ({ ...prevQueues, [selectedComponent]: response }));
 
             } catch (err) {
@@ -196,9 +209,10 @@ export default function Home() {
 
     function handleComponentMessage(selectedComponent, receivedData) {
         console.log("HandleMessageReceived:", receivedData);
-        setNotificationMessage('Mensagem recebida');
-        setShowNotification(true);
-        setTimeout(() => setShowNotification(false), 3000);
+
+        displayNotification({
+            message: "O backend terminou a analise",
+        });
 
         let key;
         switch (selectedComponent) {
@@ -207,9 +221,6 @@ export default function Home() {
                 break;
             case EnumComponent.LINEAR_REGRESSION_ANALYSIS:
                 key = "linearRegressionAnalysis";
-                break;
-            case EnumComponent.TWOD_GRAPHICS:
-                key = "twoDGraphics";
                 break;
             default:
                 console.error("Ação desconhecida!");
@@ -244,23 +255,27 @@ export default function Home() {
                     </div>
 
                 </div>
-                <div className="row justify-content-center d-flex justify-content-betwen">
-                    <div className="row adjust-margin">
-                        <div className="col-md-6 text-center column-wrapper">
-                            <ImageCorrelationComponent imgBase64Object={imgData.correlationAnalysis} />
-                        </div>
-                        <div className="col-md-6 text-center column-wrapper">
-                            <ImageCorrelationComponent imgBase64Object={imgData.linearRegressionAnalysis} />
-                        </div>
+                <div className="row justify-content-center d-flex justify-content-between">
+                    <div className="col-md-6 text-center column-wrapper">
+                        <ImageCorrelationComponent imgBase64Object={imgData.correlationAnalysis} />
                     </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-12">
-                        <ImageGraph2DComponent imgBase64Object={imgData.twoDGraphics} />
+                    <div className="col-md-6 text-center column-wrapper">
+                        <ImageCorrelationComponent imgBase64Object={imgData.linearRegressionAnalysis} />
                     </div>
                 </div>
             </div>
-            <NotificationComponent message={notificationMessage} show={showNotification} />
+            <div className="notification-container">
+                {notifications.map((n, idx) => (
+                    <NotificationComponent
+                        key={idx}
+                        show={n.show}
+                        message={n.message}
+                        entity_type={n.entity_type}
+                        action={n.action}
+                    />
+                ))}
+            </div>
+
         </>
     );
 }

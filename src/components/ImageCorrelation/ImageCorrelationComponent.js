@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./ImageCorrelationComponent.css";
-import LoaderComponent from "../Loader/LoaderComponent";
+import loaderGif from "../../assets/cosmos-gif.gif";
 
 export default function ImageCorrelationComponent({ imgBase64Object }) {
     const [imgSrc, setImgSrc] = useState(null);
@@ -18,10 +18,10 @@ export default function ImageCorrelationComponent({ imgBase64Object }) {
     return (
         <div className="img-correlation">
             {imgSrc ? (
-                <img src={imgSrc} alt="Converted PNG" className="image"/>
+                <img src={imgSrc} alt="Converted PNG" className="image" />
             ) : (
                 <div className="text-center custom-loader">
-                    <LoaderComponent />
+                    <img src={loaderGif} alt="Loader" /> 
                 </div>
             )}
         </div>
